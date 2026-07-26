@@ -17,9 +17,41 @@ class Task:
             "title": self.title,
             "done": self.done
         }
+    
+import json
+
+FILE_NAME = "tasks.json"
+
+
+def load_tasks():
+    try:
+        with open(FILE_NAME, "r", encoding="utf-8") as file:
+            task_data = json.load(file)
+
+        tasks = []
+
+        for data in task_data:
+            task = Task(data["title"])
+            task.done = data["done"]
+            tasks.append(task)
+
+        return tasks
+
+    except FileNotFoundError:
+        return []
+
+def save_tasks(tasks):
+    task_data = []
+
+    for task in tasks:
+        task_data.append(task.to_dic())
+
+    with open(FILE_NAME, "w", encoding="utf-8") as file:
+        json.dump(task_data, file, ensure_ascii=False, indent=4)
+
 
 def add_tasks(tasks):
-    title = input("Your title is: ")
+    title = input("Your title is: ").strip()
 
     if not title:
         print("Task title cannot be empty")
@@ -27,6 +59,8 @@ def add_tasks(tasks):
 
     new_task = Task(title)
     tasks.append(new_task)
+
+    save_tasks(tasks)
 
     print("Task added successfully")
 
@@ -56,6 +90,8 @@ def mark_task_done(tasks):
         selected_task = tasks[index]
         selected_task.mark_done()
 
+        save_tasks(tasks)
+
         print("Task marked as done. ")
 
     except ValueError:
@@ -81,6 +117,8 @@ def delete_tasks(tasks):
         return
 
     delete_task = tasks.pop(index)
+
+    save_tasks(tasks)
 
     print(f'Task"{delete_task.title}" deleted successfully.')
 
@@ -108,6 +146,8 @@ def edit_tasks(tasks):
         print("Task title cannot be empty")
         return
     tasks[index].title = new_task
+
+    save_tasks(tasks)
 
     print("edit successfully")
 
@@ -147,8 +187,8 @@ def menu():
 
 
 def main():
-    tasks = []
-    
+
+    tasks = load_tasks()
 
     while True:    
         menu()   
@@ -187,25 +227,3 @@ def main():
 
 main()
 
-
-        
-
-
-
-
-
-
-    
-
-
-
-
-        
-
-
-# tasks = []
-
-# add_task(tasks)
-# add_task(tasks)
-
-# show_task(tasks)
